@@ -1,5 +1,5 @@
 /*
- * @f util/ccn-lite-mkC.c
+ * @f util/ccn-lite-android-mkC.c
  * @b CLI mkContent, write to Stdout
  *
  * Copyright (C) 2013-15, Christian Tschudin, University of Basel
@@ -21,6 +21,7 @@
  */
 
 //different suites
+ //TODO: maybe these can be taken out
 #define USE_SUITE_CCNB
 #define USE_SUITE_CCNTLV
 #define USE_SUITE_CISTLV
@@ -44,27 +45,26 @@ char *witness; // used with w flag?
 
 // ----------------------------------------------------------------------
 
-int
-main(int argc, char *argv[])
+char* ccn-lite-android-mkC(char* suiteStr, char* addr, int port, char* uri, char* body_param)
 {
     unsigned char body[64*1024]; //body of content object
-    unsigned char out[65*1024]; //not sure
+    unsigned char out[65*1024]; //this should be the result
     unsigned char *publisher = out; pointer to out
-    char *infname = 0, *outfname = 0;
+    char *outfname = 0;
     unsigned int chunknum = UINT_MAX, lastchunknum = UINT_MAX;
     int f, len, opt, plen, offs = 0;
-    struct ccnl_prefix_s *name; //name of content object 
+    struct ccnl_prefix_s *prefix; //name of content object 
     int suite = CCNL_SUITE_DEFAULT; 
-    struct key_s *keys = NULL; //not exactlsure
+    struct key_s *keys = NULL; //not exactly sure
 
-    while ((opt = getopt(argc, argv, "hg:i:k:l:n:o:p:s:v:w:")) != -1) {
-        switch (opt) {
-        case 'i':
-            infname = optarg; //optarg has to be what's given in the command line 
-            break;
-        case 'k':
+    static char uri_static[100];
+
+ 
+       /* not sure about this n.s.a.t
+         case 'k':
             keys = load_keys_from_file(optarg);
-            break;
+            break; */
+        /* n.s.a.t
         case 'l':
             lastchunknum = atoi(optarg);
             break;
@@ -74,6 +74,9 @@ main(int argc, char *argv[])
         case 'o':
             outfname = optarg;
             break;
+        */
+
+        /* nsat    
         case 'p':
             publisher = (unsigned char*) optarg;
             plen = unescape_component((char*) publisher);
@@ -84,73 +87,44 @@ main(int argc, char *argv[])
                 exit(-1);
             }
             break;
-        case 's':
-            suite = ccnl_str2suite(optarg);
+            */
+        //case 's':
+           // this we need!
+            suite = ccnl_str2suite(suiteStr);
             if (!ccnl_isSuite(suite)) {
-                DEBUGMSG(ERROR, "Unsupported suite %d\n", suite);
-                goto Usage;
+                return "Suite is not valid\n";
             }
-            break;
-        case 'v':
-#ifdef USE_LOGGING //not important
-            if (isdigit(optarg[0]))
-                debug_level = atoi(optarg);
-            else
-                debug_level = ccnl_debug_str2level(optarg);
-#endif
-            break;
-
+        /* nsat
         case 'w':
             witness = optarg;
             break;
-        case 'h':
-        default:
-Usage:
-        fprintf(stderr, "usage: %s [options] URI [NFNexpr]\n"
-        "  -i FNAME    input file (instead of stdin)\n"
-        "  -k FNAME    HMAC256 key (base64 encoded)\n"
-        "  -l LASTCHUNKNUM number of last chunk\n"
-        "  -n CHUNKNUM chunknum\n"
-        "  -o FNAME    output file (instead of stdout)\n"
-        "  -p DIGEST   publisher fingerprint\n"
-        "  -s SUITE    (ccnb, ccnx2015, cisco2015, iot2014, ndn2013)\n"
-#ifdef USE_LOGGING
-        "  -v DEBUG_LEVEL (fatal, error, warning, info, debug, verbose, trace)\n"
-#endif
-        "  -w STRING   witness\n"
-        "Examples:\n"
-        "%% mkC /ndn/edu/wustl/ping             (classic lookup)\n"
-        "%% mkC /th/ere  \"lambda expr\"          (lambda expr, in-net)\n"
-        "%% mkC \"\" \"add 1 1\"                    (lambda expr, local)\n"
-        "%% mkC /rpc/site \"call 1 /test/data\"   (lambda RPC, directed)\n",
-        argv[0]);
-        exit(1);
-        }
-    } /// end while 
+            */
+    //put content parameter to 
+    body = body_param; //maybe unneccassary
 
-
-
-    if (!argv[optind]) //todo: what is optind is has to be an index argv has to be an array
-        goto Usage;
-
-    if (infname) { //taking from file 
-        f = open(infname, O_RDONLY);
-        if (f < 0)
-            perror("file open:");
-    } else
-        f = 0;
-    len = read(f, body, sizeof(body)); //read from f in body return len
-    close(f); // close file 
     memset(out, 0, sizeof(out)); //writes zeros to out??
 
     //set content object name
-    name = ccnl_URItoPrefix(argv[optind], suite, argv[optind+1],
-                            chunknum == UINT_MAX ? NULL : &chunknum);
+    strcpy(uri_static, uri); 
+    prefix = ccnl_URItoPrefix(uri_static, suite, NULL, NULL); //could have had chunk things here
 
-    switch (suite) {
+    if (!prefix) {
+        return "no URI found, aborting\n";
+    }
+
+    //this function takes prefix, body and length, something and builds the result into string object "out"
+    //TODO: fix length
+    //for CCNL_SUITE_CCNB
+    //len = ccnl_ccnb_fillContent(prefix, body, len, NULL, out);
+
+    //from USE_SUITE_CCNTLV
+    
+    len = ccnl_ccntlv_prependContentWithHdr(prefix, body, len, NULL, NULL , &offs, out);
+
+    /*switch (suite) {
 #ifdef USE_SUITE_CCNB
     case CCNL_SUITE_CCNB:
-        len = ccnl_ccnb_fillContent(name, body, len, NULL, out);
+        len = ccnl_ccnb_fillContent(prefix, body, len, NULL, out);
         break;
 #endif
 #ifdef USE_SUITE_CCNTLV
@@ -163,19 +137,19 @@ Usage:
             // use the first key found in the key file
             ccnl_hmac256_keyval(keys->key, keys->keylen, keyval);
             ccnl_hmac256_keyid(keys->key, keys->keylen, keyid);
-            len = ccnl_ccntlv_prependSignedContentWithHdr(name, body, len,
+            len = ccnl_ccntlv_prependSignedContentWithHdr(prefix, body, len,
                   lastchunknum == UINT_MAX ? NULL : &lastchunknum,
                   NULL, keyval, keyid, &offs, out);
         } else
-            len = ccnl_ccntlv_prependContentWithHdr(name, body, len,
+            len = ccnl_ccntlv_prependContentWithHdr(prefix, body, len,
                           lastchunknum == UINT_MAX ? NULL : &lastchunknum,
-                          NULL /* Int *contentpos */, &offs, out);
+                          NULL , &offs, out);
         break;
 #endif
 #ifdef USE_SUITE_CISTLV
     case CCNL_SUITE_CISTLV:
         offs = CCNL_MAX_PACKET_SIZE;
-        len = ccnl_cistlv_prependContentWithHdr(name, body, len,
+        len = ccnl_cistlv_prependContentWithHdr(prefix, body, len,
                   lastchunknum == UINT_MAX ? NULL : &lastchunknum,
                   NULL, &offs, out);
         break;
@@ -183,7 +157,7 @@ Usage:
 #ifdef USE_SUITE_IOTTLV
     case CCNL_SUITE_IOTTLV:
         offs = CCNL_MAX_PACKET_SIZE;
-        if (ccnl_iottlv_prependReply(name, body, len, &offs, NULL,
+        if (ccnl_iottlv_prependReply(prefix, body, len, &offs, NULL,
                    lastchunknum == UINT_MAX ? NULL : &lastchunknum, out) < 0
               || ccnl_switch_prependCoding(CCNL_ENC_IOT2014, &offs, out) < 0)
             return -1;
@@ -199,11 +173,11 @@ Usage:
             // use the first key found in the key file
             ccnl_hmac256_keyval(keys->key, keys->keylen, keyval);
             ccnl_hmac256_keyid(keys->key, keys->keylen, keyid);
-            len = ccnl_ndntlv_prependSignedContent(name, body, len,
+            len = ccnl_ndntlv_prependSignedContent(prefix, body, len,
                   lastchunknum == UINT_MAX ? NULL : &lastchunknum,
                   NULL, keyval, keyid, &offs, out);
         } else {
-            len = ccnl_ndntlv_prependContent(name, body, len,
+            len = ccnl_ndntlv_prependContent(prefix, body, len,
                   NULL, lastchunknum == UINT_MAX ? NULL : &lastchunknum,
                   &offs, out);
         }
@@ -211,7 +185,7 @@ Usage:
 #endif
     default:
         break;
-    }
+    } */
 
     if (outfname) {
         f = creat(outfname, 0666);
