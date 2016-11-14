@@ -28,13 +28,13 @@ Setup:
 
 '''
 import json
-
+from subprocess import call
 import ccnlite.client
 nw = ccnlite.client.Access()
 
 projectPrefixString = "unoise"
 locPrefixArray = ['utn','foobar', 'rullan']
-nodePreficArray = ['node1', 'node2']
+nodePrefixArray = ['node1', 'node2']
 seqnoPrefixArray = ['1','2','3','4']
 
 #firstPrefix = '/'+ projectPrefixString +'/'+ locPrefixArray[0] +'/'+ seqnoPrefixArray[0]
@@ -56,15 +56,15 @@ j = 0 # for node
 #request 6 items of sensor data for every location
 for location in locPrefixArray:
 	j = 0 # for node
-	for node in nodePreficArray:
+	for node in nodePrefixArray:
 		for seqno in seqnoPrefixArray:
 			currPrefix = '/'+ projectPrefixString +'/'+ location +'/'+ node +'/' + seqno
-			print currPrefix
-			pkts = nw.getLabeledContent(currPrefix, raw=False) 
-			print pkts[0]
-			print 'j: ' + str(j)
-			print 'i: ' + str(i)
-			print data_store
+			#print currPrefix
+			pkts = nw.getLabeledContent(currPrefix, raw=False) #TODO if this doesn't return anything the program breaks add a check
+			#print pkts[0]
+			#print 'j: ' + str(j)
+			#print 'i: ' + str(i)
+			#print data_store
 			data_store[i][j].append(pkts[0].rstrip('\r\n'))
 		j = j+1
 		data_store[i].append([])
@@ -72,55 +72,48 @@ for location in locPrefixArray:
 	data_store.append([[]])
 
 print data_store #TODO store this in a database
-# example output [['90', '60', '40', '20', '85', '65', '45', '15'], ['45', '50', '60', '70', '43', '52', '63', '69'], ['200', '250', '300', '400', '180', '275', '280', '420'], []]
+# this data object is gross becasue it marks the end of every array with an empty array
+# but the output is [[location1:[node1_list], [node2_list], []], [location2:[node1_list], [node2_list], []], [location3:[node1_list], [node2_list], []], [[]]]
+# example output [[['90', '60', '40', '20'], ['85', '65', '45', '15'], []], [['45', '50', '60', '70'], ['43', '52', '63', '69'], []], [['200', '250', '300', '400'], ['180', '275', '280', '420'], []], [[]]]
 
-#build sensor data object
-'''
-activeSensorArray = [[]]
-i=0
+#build sensor data string
+i=0 #for location
+j=0 #for node
+activeSensorString = ''
+
 for location in locPrefixArray:
-	#print data_store[0][0]
-	if (int(data_store[i][0]) >= 0): #if the data_store array has a value for a node then the node is alive typ
-		#print location + ' is active' 
-		activeSensorArray[i].append(location)
-		#how long is row
-		#print location + ' length: ' + str(len(data_store[i]))
-		activeSensorArray[i].append(len(data_store[i]))
-	i = i+1
-	activeSensorArray.append([])
-
-print 'hello'
-print  activeSensorArray
-'''
-'''
-TODO: build a json object
-#build json object
-json_sensor_data = "{sensor_data:[{'"
-
-for location in activeSensorArray:
-	print location[0]
-
-	#json_sensor_data = json_sensor_data + str(location[0]) + " ':' " +  str(location[0]) + " ' },"
+	activeSensorString = activeSensorString + location + ':'
+	j=0
+	for node in nodePrefixArray:
+		if (int(data_store[i][j][0]) >= 0): #if the data_store array has a value for a node then the node is alive typ
+			#print node + ' is active' 
+			activeSensorString = activeSensorString + node + ','
+			#print '*** string ***'
+			#print activeSensorString
+		j = j+1
+print activeSensorString 
+# TODO maybe make a json object out of this
+# this string is gross because each end has an extra comma at the end
+# example output: utn:node1,node2,foobar:node1,node2,rullan:node1,node2,
 
 
-json_sensor_data = json_sensor_data + "]}" 
+#write the string to a txt file
+f = open('activeSensorString.txt', 'w')
+f.write(activeSensorString + '\n')
+f.close()
 
-print json_sensor_data
+#use the subprocess command with the text file you just made 
+call("/home/josn3503/ccn-lite/bin/ccn-lite-mkC -i /home/josn3503/ccn-lite/src/py/activeSensorString.txt -s ndn2013 '/ndn/test/activeSensorString' > /home/josn3503/ccn-lite/test/ndntlv/activeSensorString.ndntlv", shell=True)
 
-json_data = json.dumps(activeSensorArray)
-'''
+#add content object file to cache
+call("$CCNL_HOME/bin/ccn-lite-ctrl -x /tmp/mgmt-relay-b.sock addContentToCache $CCNL_HOME/test/ndntlv/activeSensorString.ndntlv", shell=True)
 
-#TODO: create a content object of that sensor_data json
+pkts = nw.getLabeledContent('/ndn/test/activeSensorString', raw=False)
+print pkts[0]
 
 #TODO: store values in data base
 
 #TODO: do prediction stuff and make content objects
-'''
-print activeSensorArray
-print data_store
-
-print json_data
-'''
 
 
 

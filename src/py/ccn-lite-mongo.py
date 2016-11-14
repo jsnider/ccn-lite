@@ -32,4 +32,5 @@ db = client.test
 cursor = db.test.find()
 
 for document in cursor:
-    print(document)
+    print(document
+)
