@@ -49,28 +49,33 @@ nw.connect(relay_ip, relay_port)
 #print pkts[0]
 
 
-data_store = [[]]
+data_store = [[[]]]
 
-i = 0
-
+i = 0 # for location
+j = 0 # for node
 #request 6 items of sensor data for every location
 for location in locPrefixArray:
+	j = 0 # for node
 	for node in nodePreficArray:
 		for seqno in seqnoPrefixArray:
 			currPrefix = '/'+ projectPrefixString +'/'+ location +'/'+ node +'/' + seqno
-			#print currPrefix
+			print currPrefix
 			pkts = nw.getLabeledContent(currPrefix, raw=False) 
-			#print pkts[0]
-			#print "i: " + str(i)
-			data_store[i].append(pkts[0].rstrip('\r\n'))
+			print pkts[0]
+			print 'j: ' + str(j)
+			print 'i: ' + str(i)
+			print data_store
+			data_store[i][j].append(pkts[0].rstrip('\r\n'))
+		j = j+1
+		data_store[i].append([])
 	i = i+1
-	data_store.append([])
+	data_store.append([[]])
 
 print data_store #TODO store this in a database
 # example output [['90', '60', '40', '20', '85', '65', '45', '15'], ['45', '50', '60', '70', '43', '52', '63', '69'], ['200', '250', '300', '400', '180', '275', '280', '420'], []]
 
 #build sensor data object
-
+'''
 activeSensorArray = [[]]
 i=0
 for location in locPrefixArray:
@@ -86,7 +91,7 @@ for location in locPrefixArray:
 
 print 'hello'
 print  activeSensorArray
-
+'''
 '''
 TODO: build a json object
 #build json object
