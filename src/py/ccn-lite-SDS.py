@@ -76,6 +76,12 @@ print data_store #TODO store this in a database
 # but the output is [[location1:[node1_list], [node2_list], []], [location2:[node1_list], [node2_list], []], [location3:[node1_list], [node2_list], []], [[]]]
 # example output [[['90', '60', '40', '20'], ['85', '65', '45', '15'], []], [['45', '50', '60', '70'], ['43', '52', '63', '69'], []], [['200', '250', '300', '400'], ['180', '275', '280', '420'], []], [[]]]
 
+
+# pandas python prediction 
+# compute 5th data value for utn foobar and rullan 
+# 
+
+
 #build sensor data string
 i=0 #for location
 j=0 #for node

@@ -8,7 +8,7 @@
 #call("/home/josn3503/ccn-lite/bin/ccn-lite-mkC -i /home/josn3503/ccn-lite/src/py/file_one.txt -s ndn2013 '/ndn/test/mycontent' > /home/josn3503/ccn-lite/test/ndntlv/mycontent.ndntlv", stdin=subprocess.PIPE, shell=True)
 
 
-
+'''
 import subprocess
 
 proc = subprocess.Popen(['/home/josn3503/ccn-lite/bin/ccn-lite-mkC', 
@@ -19,6 +19,8 @@ proc = subprocess.Popen(['/home/josn3503/ccn-lite/bin/ccn-lite-mkC',
                         )
 stdout_value = proc.communicate("what the flerp")[0]
 print '\tpass through:', repr(stdout_value)
+
+'''
 
 
 '''
