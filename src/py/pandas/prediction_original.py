@@ -4,10 +4,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pylab as plt
 from matplotlib.pylab import rcParams
-import time
 rcParams['figure.figsize'] = 15, 6
+
+
 from statsmodels.tsa.stattools import adfuller
-from statsmodels.tsa.seasonal import seasonal_decompose
+#from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.stattools import acf,pacf
 from statsmodels.tsa.arima_model import ARIMA
 
@@ -30,8 +31,8 @@ def test_stationarity(timeseries):
         dfoutput['Critical value(%s)'%key]=value
     print dfoutput
 
-
-data=pd.read_csv('AirPassengers.csv')
+dateparse = lambda dates: pd.datetime.strptime(dates, '%Y-%m')
+data=pd.read_csv('AirPassengers.csv', parse_dates='Month', index_col='Month',date_parser=dateparse)
 #data=pd.read_csv('/home/eric/python/LightData4.csv')
 #dateparse = lambda dates: pd.datetime.strptime(dates, '%y-%m-%d %H%M')
 dateparse = lambda dates: pd.datetime.strptime(dates, '%Y-%m')

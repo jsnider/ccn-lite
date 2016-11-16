@@ -20,34 +20,100 @@ File history:
 
 Setup:
 
-0) install pip
-	sudo python -m pip install --upgrade pip
-1) install pandas and a bunch of stuff, take 3-4 minutes to run
-	pip install --user numpy scipy matplotlib ipython jupyter pandas sympy nose
-2) add export PATH="$PATH:/home/your_user/.local/bin" to path
+# 0) install pip
+# 	sudo python -m pip install --upgrade pip
+# 1) install pandas and a bunch of stuff, take 3-4 minutes to run
+# 	pip install --user numpy scipy matplotlib ipython jupyter pandas sympy nose
+# 2) add export PATH="$PATH:/home/your_user/.local/bin" to path
 	
-3) instal this one too
-	sudo apt-get install python-tk
-4) and this one
-	python -mpip install statsmodels
-5) 
+# 3) instal this one too
+# 	sudo apt-get install python-tk
+# 4) and this one
+# 	python -mpip install statsmodels
+# 5) 
+
+Secon attempt
+
+1) 
+	#sudo apt-get install python-pip
+	sudo apt-get install python-numpy
+	sudo apt-get install python-pandas
+2) lso di this
+	sudo pip install --upgrade IPython
+
+
 '''
 import pandas as pd
 import numpy as np
 import matplotlib.pylab as plt
+#%matplotlib inline didn't get this to work
 from matplotlib.pylab import rcParams
 rcParams['figure.figsize'] = 15, 6
+
+from datetime import datetime
 from statsmodels.tsa.stattools import adfuller
-from statsmodels.tsa.seasonal import seasonal_decompose
+#from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.stattools import acf,pacf
 from statsmodels.tsa.arima_model import ARIMA
 
-#setup date format
-dateparse = lambda dates: pd.datetime.strptime(dates, '%Y%m%d') 
 
-data=pd.read_csv('data.csv')
+data=pd.read_csv('AirPassengers.csv')
+print data.head()
+print data.dtypes
+
+dateparse = lambda dates: pd.datetime.strptime(dates, '%Y-%m')
+data = pd.read_csv('AirPassengers.csv', parse_dates='Month', index_col='Month',date_parser=dateparse)
 print data.head()
 
+print data.index
+
+ts = data['#Passengers'] 
+print ts.head(10)
+
+
+ts_log = np.log(ts)
+
+print ts_log
+ts_log_diff = ts_log - ts_log.shift()
+
+model = ARIMA(ts_log, order=(2, 1, 0))
+results_AR = model.fit(disp=-1)  
+plt.plot(ts_log_diff)
+plt.plot(results_AR.fittedvalues, color='red')
+plt.title('RSS: %.4f'% sum((results_AR.fittedvalues-ts_log_diff)**2))
+
+plt.show()
+
+model = ARIMA(ts_log, order=(0, 1, 2))  
+results_MA = model.fit(disp=-1)  
+plt.plot(ts_log_diff)
+plt.plot(results_MA.fittedvalues, color='red')
+plt.title('RSS: %.4f'% sum((results_MA.fittedvalues-ts_log_diff)**2))
+
+model = ARIMA(ts_log, order=(0, 1, 2))  
+results_MA = model.fit(disp=-1)  
+plt.plot(ts_log_diff)
+plt.plot(results_MA.fittedvalues, color='red')
+plt.title('RSS: %.4f'% sum((results_MA.fittedvalues-ts_log_diff)**2))
+
+
+print model
+'''
+moving_avg = pd.rolling_mean(ts_log,12)
+ts_log_moving_avg_diff = ts_log - moving_avg
+print ts_log_moving_avg_diff.head(12)
+
+ts_log_moving_avg_diff.dropna(inplace=True)
+test_stationarity(ts_log_moving_avg_diff)
+
+expwighted_avg = pd.ewma(ts_log, halflife=12) 
+ 
+print expwighted_avg 
+
+'''
+
+
+'''
 
 time_series=data['#Play']
 print "time series data"
@@ -96,8 +162,13 @@ print time_series_log
 print "time series log end"
 
 #order p d q
-model=ARIMA(time_series_log,order=(0,1,0))
 
+print "time series begin"
+print time_series_log
+print "time series end"
+
+model=ARIMA(time_series_log,order=(0,1,0))
+'''
 '''
 result_ARIMA=model.fit(disp=-1)
 predictions_ARIMA_diff=pd.Series(result_ARIMA.fittedvalues,copy=True)
