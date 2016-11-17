@@ -1,0 +1,24 @@
+
+this URL: 
+	https://developer.ibm.com/recipes/tutorials/cloudant-nosql-db-as-historian-data-storage-for-ibm-watson-iot-partii/
+
+The URL format for Cloudant Query looks as shown below:
+	https://cloudant-host/cloudant-database-name/_design/iotp/_view/view-name
+
+  "host": "824ec716-c094-47ff-a4e0-dca7918f3e8c-bluemix.cloudant.com",
+
+  "DBname" : "iotp_z0zqjv_default_2016-11"
+
+  mine:
+
+  	https://824ec716-c094-47ff-a4e0-dca7918f3e8c-bluemix.cloudant.com/iotp_z0zqjv_default_2016-11/_design/iotp/_view/by-deviceId
+
+{
+  "username": "824ec716-c094-47ff-a4e0-dca7918f3e8c-bluemix",
+  "password": "f846902c4c121441f60ac3a844656038faece954cd913e33ea4bb6b3d51241a6",
+  "host": "824ec716-c094-47ff-a4e0-dca7918f3e8c-bluemix.cloudant.com",
+  "port": 443,
+  "url": "https://824ec716-c094-47ff-a4e0-dca7918f3e8c-bluemix:f846902c4c121441f60ac3a844656038faece954cd913e33ea4bb6b3d51241a6@824ec716-c094-47ff-a4e0-dca7918f3e8c-bluemix.cloudant.com/iotp_z0zqjv_default_2016-11/_design/iotp/_view/by-deviceId"
+}
+
+  "url": "https://824ec716-c094-47ff-a4e0-dca7918f3e8c-bluemix:f846902c4c121441f60ac3a844656038faece954cd913e33ea4bb6b3d51241a6@824ec716-c094-47ff-a4e0-dca7918f3e8c-bluemix.cloudant.com/iotp_z0zqjv_default_2016-11/_design/iotp/_view/by-deviceId?limit=5"
