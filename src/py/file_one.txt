@@ -1,0 +1,63 @@
+this is the data from the file for the mk content test
+
+from subprocess import Popen
+
+import subprocess
+subprocess.Popen(cmd, stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+
+import subprocess
+p1 = Popen(["ls -l"], stdout=subprocess.PIPE)
+p2 = Popen(["grep", "android"], stdin=p1.stdout, stdout=subprocess.PIPE)
+p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
+output = p2.communicate()[0]
+print output
+
+
+p1 = subprocess.Popen(["ls"], stderr=subprocess.STDOUT, stdout=subprocess.PIPE)
+p2 = subprocess.Popen(["grep", "android"], stdin=p1.stdout, stdout=subprocess.PIPE)
+
+
+
+import subprocess
+
+print '\nread:'
+proc = subprocess.Popen(['echo', '"to stdout"'], 
+                        stdout=subprocess.PIPE,
+                        )
+stdout_value = proc.communicate()[0]
+print '\tstdout:', repr(stdout_value)
+
+
+
+import subprocess
+
+proc = subprocess.Popen(['echo', '-'],
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        )
+stdout_value = proc.communicate('through stdin to stdout')[0]
+print '\tpass through:', repr(stdout_value)
+
+
+
+import subprocess
+
+cat = subprocess.Popen(['cat', 'index.rst'], 
+                        stdout=subprocess.PIPE,
+                        )
+
+grep = subprocess.Popen(['grep', '.. include::'],
+                        stdin=cat.stdout,
+                        stdout=subprocess.PIPE,
+                        )
+
+cut = subprocess.Popen(['cut', '-f', '3', '-d:'],
+                        stdin=grep.stdout,
+                        stdout=subprocess.PIPE,
+                        )
+
+end_of_pipe = cut.stdout
+
+print 'Included files:'
+for line in end_of_pipe:
+    print '\t', line.strip()

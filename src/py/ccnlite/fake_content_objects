@@ -1,0 +1,46 @@
+#build face to adrians machine
+
+	FACEID=`$CCNL_HOME/bin/ccn-lite-ctrl -x /tmp/mgmt-relay-b.sock newUDPface any 130.238.15.221 9695 | $CCNL_HOME/bin/ccn-lite-ccnb2xml | grep FACEID | sed -e 's/^[^0-9]*\([0-9]\+\).*/\1/'`
+
+	$CCNL_HOME/bin/ccn-lite-ctrl -x /tmp/mgmt-relay-b.sock prefixreg /unoise $FACEID ndn2013 | $CCNL_HOME/bin/ccn-lite-ccnb2xml
+
+	$CCNL_HOME/bin/ccn-lite-peek -s ndn2013 -u 127.0.0.1/9999 "unoise/rullan/1"   | $CCNL_HOME/bin/ccn-lite-pktdump
+
+#make content object 
+
+	/*josn3503@josn3503-project-DV-2016:~/ccn-lite/src$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/foobar/3" > $CCNL_HOME/test/ndntlv/mycontent1.ndntlv
+	45
+	josn3503@josn3503-project-DV-2016:~/ccn-lite/src$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/foobar/4" > $CCNL_HOME/test/ndntlv/mycontent4.ndntlv
+	50
+	josn3503@josn3503-project-DV-2016:~/ccn-lite/src$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/foobar/5" > $CCNL_HOME/test/ndntlv/mycontent5.ndntlv
+	60
+	josn3503@josn3503-project-DV-2016:~/ccn-lite/src$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/foobar/6" > $CCNL_HOME/test/ndntlv/mycontent6.ndntlv
+	70
+	josn3503@josn3503-project-DV-2016:~/ccn-lite/src$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/utn/3" > $CCNL_HOME/test/ndntlv/mycontent13.ndntlv
+	90
+	josn3503@josn3503-project-DV-2016:~/ccn-lite/src$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/utn/4" > $CCNL_HOME/test/ndntlv/mycontent14.ndntlv
+	60  
+	josn3503@josn3503-project-DV-2016:~/ccn-lite/src$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/utn/5" > $CCNL_HOME/test/ndntlv/mycontent15.ndntlv
+	40
+	josn3503@josn3503-project-DV-2016:~/ccn-lite/src$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/utn/6" > $CCNL_HOME/test/ndntlv/mycontent13.ndntlv
+	20
+	josn3503@josn3503-project-DV-2016:~/ccn-lite/src$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/utn/3" > $CCNL_HOME/test/ndntlv/mycontent23.ndntlv
+	150
+	josn3503@josn3503-project-DV-2016:~/ccn-lite/src$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/utn/4" > $CCNL_HOME/test/ndntlv/mycontent24.ndntlv
+	190
+	josn3503@josn3503-project-DV-2016:~/ccn-lite/src$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/utn/5" > $CCNL_HOME/test/ndntlv/mycontent25.ndntlv
+	210
+	josn3503@josn3503-project-DV-2016:~/ccn-lite/src$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/utn/6" > $CCNL_HOME/test/ndntlv/mycontent26.ndntlv
+	220
+	josn3503@josn3503-project-DV-2016:~/ccn-lite/src/py$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/rullan/3" > $CCNL_HOME/test/ndntlv/mycontent53.ndntlv
+	200
+	josn3503@josn3503-project-DV-2016:~/ccn-lite/src/py$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/rullan/4" > $CCNL_HOME/test/ndntlv/mycontent54.ndntlv
+	250
+	josn3503@josn3503-project-DV-2016:~/ccn-lite/src/py$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/rullan/5" > $CCNL_HOME/test/ndntlv/mycontent55.ndntlv
+	300
+	josn3503@josn3503-project-DV-2016:~/ccn-lite/src/py$ $CCNL_HOME/bin/ccn-lite-mkC -s ndn2013 "/unoise/rullan/6" > $CCNL_HOME/test/ndntlv/mycontent56.ndntlv
+	400 */
+
+#do it in python
+
+python ./ccn-lite-peek.py -u 127.0.0.1/9999 -c /unoise/utn/6
